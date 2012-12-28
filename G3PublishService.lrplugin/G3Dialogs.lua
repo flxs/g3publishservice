@@ -200,7 +200,7 @@ function renew_key(account)
 			
 			if result=="ok"  then
 				--attempt to fetch key
-				local key = G3Api.retrieveKey(account.url, account.user, properties.pass or "")
+                local key = G3Api.retrieveKey(account.url.."/"..account.path_to_rest, account.user, properties.pass or "")
 				if key==403 or key==404 then LrDialogs.message("Error", "Wrong URL or credentials.")
 				else
 					prefs.accounts[account.identifier].authkey = key

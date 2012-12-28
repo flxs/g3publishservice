@@ -16,7 +16,7 @@ return {
 	
 	LrPluginInfoProvider = 'LRInfoProvider.lua',
 	
-	VERSION = { major=0, minor=3, revision=5, build=0, },
+	VERSION = { major=0, minor=3, revision=6, build=0, },
 	
 	LrInitPlugin = 'LRInitPlugin.lua'
 
