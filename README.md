@@ -16,7 +16,7 @@ Inspired by the Flickr integration in Lightroom 3, I've written a plugin to do q
 
 #### Current Version ####
 
-The current version is **0.3.5** (released on October 1, 2010.)
+The current version is **0.4.0** (released on December 28, 2012.)
 
 
 #### Important Notes ####
@@ -42,7 +42,8 @@ When used as a publish service, it can update photos in the Gallery when you cha
 * **0.3.3:** Updating photos that aren't in the Gallery is handled more gracefully now (user is being prompted whether to delete locally or upload as new)
 * **0.3.4:** Comment integration added; this requires the Gallery 3 module user_rest to be installed and activated.
 * **0.3.4:** Short info text added to the create album dialog.
-* **0.3.5:** Bug fix: Comment integration couldn't be properly disabled in some cases.
+* **0.3.6:** Bug fix: renew key sometimes fails
+* **0.4.0:** Feature: introduce basic authentication
 
 #### Known Issues ####
 

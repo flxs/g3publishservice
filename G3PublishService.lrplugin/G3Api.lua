@@ -5,6 +5,7 @@ local LrDialogs = import 'LrDialogs'
 local LrView = import 'LrView'
 local LrBinding = import 'LrBinding'
 local LrFunctionContext = import 'LrFunctionContext'
+local LrStringUtils = import 'LrStringUtils'
 local LrPath = import 'LrPathUtils'
 local LrDate = import 'LrDate'
 local bind = LrView.bind
@@ -43,17 +44,23 @@ G3Api = {}
  
 --returns 403 if 403 forbidden is returned, 404 on 404 (so that the login dialog can be shown a second time,
 --throws an error on all other error responses and returns the key on success
-function G3Api.retrieveKey(url, user, pass)
+function G3Api.retrieveKey(url, user, pass, basicauth_active, basicauth_user, basicauth_password )
 	local url_rest = url	--.."/index.php/rest/"
 	local body = "user="..user.."&password="..pass
 
-	logger:debug("RetrieveKey url="..url_rest..", user="..user)
+	logger:debug("RetrieveKey url="..url_rest..", user="..user..", basicauth_active="..tostring(basicauth_active)..", basicauth_user="..basicauth_user)
 	
 	local headers = {
 		{field = 'X-Gallery-Request-Method', value = "post" },
 		{field = 'Content-Type', value = "application/x-www-form-urlencoded" }, 
 		{field = 'Content-Length', value = #body },
 	}
+
+    if basicauth_active then
+       table.insert( headers, 
+           { field = 'Authorization', value = 'Basic '..LrStringUtils.encodeBase64(basicauth_user..":"..basicauth_password) }
+       )
+    end
 
 	local result, hdrs = LrHttp.post( url_rest, body , headers )
 	if not result then LrDialogs.message("result is nil.") end
@@ -96,6 +103,14 @@ function G3Api.get(url, propertyTable)
 		{field = 'X-Gallery-Request-Method', value = "get" },
 		{field = 'X-Gallery-Request-key', value = propertyTable.selectedAccount.authkey },   
 	}
+
+    -- Add Basic Authentication Header
+    if propertyTable.selectedAccount.basicauth_active then
+       table.insert( headers, 
+           { field = 'Authorization', value = 'Basic '..LrStringUtils.encodeBase64(propertyTable.selectedAccount.basicauth_user..":"..propertyTable.selectedAccount.basicauth_password) }
+       )
+    end
+    -- End Basic Authentication Header
 	
 	local result,hdrs = LrHttp.get( url, headers)
 	
@@ -200,6 +215,14 @@ function G3Api.createAlbum(parentUrl, name, propertyTable, title)
 		{field = 'Content-Type', value = "application/x-www-form-urlencoded" }, 
 		{field = 'Content-Length', value = #body },
 	}	
+	
+    -- Add Basic Authentication Header
+    if propertyTable.selectedAccount.basicauth_active then
+       table.insert( headers, 
+           { field = 'Authorization', value = 'Basic '..LrStringUtils.encodeBase64(propertyTable.selectedAccount.basicauth_user..":"..propertyTable.selectedAccount.basicauth_password) }
+       )
+    end
+    -- End Basic Authentication Header
 		
 	logger:debug("CreateAlbum body="..body)
 	
@@ -304,6 +327,14 @@ function G3Api.uploadImage(targetId, method, filePath, fileName, title, descript
 		{field = 'X-Gallery-Request-Key', value = propertyTable.selectedAccount.authkey },
 	}	
 	
+    -- Add Basic Authentication Header
+    if propertyTable.selectedAccount.basicauth_active then
+       table.insert( headers, 
+           { field = 'Authorization', value = 'Basic '..LrStringUtils.encodeBase64(propertyTable.selectedAccount.basicauth_user..":"..propertyTable.selectedAccount.basicauth_password) }
+       )
+    end
+    -- End Basic Authentication Header
+    	
 	local body = {type="photo"}
 	if fileName and fileName~="" then body.name = fileName end
 	if title and title~="" then body.title = title end
@@ -364,6 +395,14 @@ function G3Api.deleteElement(id, propertyTable)
 		{field = 'X-Gallery-Request-Method', value = "delete" },
 		{field = 'X-Gallery-Request-Key', value = propertyTable.selectedAccount.authkey },
 	}
+
+    -- Add Basic Authentication Header
+    if propertyTable.selectedAccount.basicauth_active then
+       table.insert( headers, 
+           { field = 'Authorization', value = 'Basic '..LrStringUtils.encodeBase64(propertyTable.selectedAccount.basicauth_user..":"..propertyTable.selectedAccount.basicauth_password) }
+       )
+    end
+    -- End Basic Authentication Header
 
 	local result, hdrs = LrHttp.post( url, "" , headers )
 	
@@ -522,6 +561,14 @@ function G3Api.postComment(id, text, propertyTable)
 		{field = 'X-Gallery-Request-Key', value = propertyTable.selectedAccount.authkey },
 	}	
 	
+    -- Add Basic Authentication Header
+    if propertyTable.selectedAccount.basicauth_active then
+       table.insert( headers, 
+           { field = 'Authorization', value = 'Basic '..LrStringUtils.encodeBase64(propertyTable.selectedAccount.basicauth_user..":"..propertyTable.selectedAccount.basicauth_password) }
+       )
+    end
+    -- End Basic Authentication Header
+	
 	local body = {text=text,
 		item=G3Api.url(id, propertyTable)
 	}
@@ -676,6 +723,14 @@ end
 		{field = 'X-Gallery-Request-Method', value = "put" },
 		{field = 'X-Gallery-Request-Key', value = prefs.authkey },
 	}
+    
+    -- Add Basic Authentication Header
+    if propertyTable.selectedAccount.basicauth_active then
+       table.insert( headers, 
+           { field = 'Authorization', value = 'Basic '..LrStringUtils.encodeBase64(propertyTable.selectedAccount.basicauth_user..":"..propertyTable.selectedAccount.basicauth_password) }
+       )
+    end
+    -- End Basic Authentication Header
 	
 	local body = {}
 	if title and title~="" then body.title = title end

@@ -140,7 +140,7 @@ end
 function add_account()
 	LrTasks.startAsyncTask( function()
 
-		local authKey,url,user,path_to_rest = G3Dialogs.showLoginDialogAndLogin()
+		local authKey,url,user,path_to_rest,basicauth_active,basicauth_user,basicauth_password = G3Dialogs.showLoginDialogAndLogin()
 		--handle cancel
 		if not authKey then 
 			return
@@ -148,7 +148,7 @@ function add_account()
 		
 		local k = url.." - "..user.." - "..string.sub(authKey, 1, 10).."..."
 		--prefs.accounts = {}
-		prefs.accounts[k] = {authkey = authKey, user = user, url = url, identifier = k, path_to_rest = path_to_rest}
+		prefs.accounts[k] = {authkey = authKey, user = user, url = url, identifier = k, path_to_rest = path_to_rest, basicauth_active = basicauth_active, basicauth_user = basicauth_user, basicauth_password = basicauth_password }
 		
 		--force the observable table to propagate the change
 		prefs.accounts = prefs.accounts
@@ -197,13 +197,14 @@ function renew_key(account)
 				title = "Password", 
 				contents = contents,
 			}
-			
-			if result=="ok"  then
-				--attempt to fetch key
-				local key = G3Api.retrieveKey(account.url, account.user, properties.pass or "")
-				if key==403 or key==404 then LrDialogs.message("Error", "Wrong URL or credentials.")
-				else
-					prefs.accounts[account.identifier].authkey = key
+
+
+            if result=="ok"  then
+                --attempt to fetch key
+                local key = G3Api.retrieveKey(account.url.."/"..account.path_to_rest, account.user, properties.pass or "", account.basicauth_active or false, account.basicauth_user or "", account.basicauth_password or "")
+                if key==403 or key==404 then LrDialogs.message("Error", "Wrong URL or credentials.")
+                else
+                    prefs.accounts[account.identifier].authkey = key
 					LrDialogs.message("Auth Key renewed.")
 				end
 			end
@@ -320,6 +321,7 @@ function G3Dialogs.showLoginDialogAndLogin()
 	local f = LrView.osFactory()
 	local properties = LrBinding.makePropertyTable( context )
 	properties.rest_path = "/index.php/rest/"
+    properties.basicauth_active = "off"; --[[ Basic Authentication: Default Value is off ]]--
 	--properties.url = prefs.url
 	--properties.user = prefs.user
 
@@ -394,6 +396,55 @@ function G3Dialogs.showLoginDialogAndLogin()
 				value = bind 'url_is_rest',
 			},
 		},]]--
+		
+        --[[
+            Basic Authentication Dialog Properties 
+        ]]--
+        f:row {
+            f:separator {
+                fill_horizontal = 1,
+            },
+        },
+
+        f:row {
+            spacing = f:label_spacing(),
+            f:checkbox { 
+                alignment = 'lright',
+                title = "Basic Authentication",
+                checked_value = "on",
+                unchecked_value = "off",
+                value = bind 'basicauth_active',
+            },
+        },
+
+        f:row {
+            spacing = f:label_spacing(),
+            f:static_text {
+                title = "Basic Auth - User",
+                alignment = 'lright',
+                width = share 'title_width',
+            },
+            f:edit_field { 
+                fill_horizonal = 1,
+                width_in_chars = 35, 
+                value = bind 'basicauth_user',
+            },
+        },
+      
+        f:row {
+            spacing = f:label_spacing(),
+            f:static_text {
+                title = "Basic Auth - Password",
+                alignment = 'lright',
+                width = share 'title_width',
+            },
+            f:password_field { 
+                fill_horizonal = 1,
+                width_in_chars = 35, 
+                value = bind 'basicauth_password',
+            },
+        },
+		
     }
     
 	
@@ -413,8 +464,14 @@ function G3Dialogs.showLoginDialogAndLogin()
 			properties.url = string.sub(properties.url, 1, #properties.url-9)
 		end
 		
+		if basicauth_active == "off" then
+		  basicauth_active = true;
+		else
+          basicauth_active = false;
+		end
+		
 		--attempt to fetch key
-		local key = G3Api.retrieveKey(properties.url.."/"..properties.rest_path, properties.user, properties.pass or "")
+		local key = G3Api.retrieveKey(properties.url.."/"..properties.rest_path, properties.user, properties.pass or "", properties.basicauth_active or false, properties.basicauth_user or "", properties.basicauth_password or "")
 		--if forbidden, then credentials are wrong
 		if key==403 then LrDialogs.message("Error", "Wrong user name or password.")
 		--if 404, then the url is wrong
@@ -424,7 +481,7 @@ function G3Dialogs.showLoginDialogAndLogin()
 			--prefs.url = properties.url
 			--prefs.user = properties.user
 
-			return key, properties.url, properties.user, properties.rest_path
+			return key, properties.url, properties.user, properties.rest_path, properties.basicauth_active, properties.basicauth_user, properties.basicauth_password
 		end
 	else
 		LrErrors.throwCanceled()	
