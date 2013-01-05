@@ -4,19 +4,19 @@ This plugin was previously located at [this site](http://felix.sappe.lt/?p=123).
 
 Thanks to Jeffrey Friedl for his JSON.lua script that this plugin is using.
 
+The current version is 0.3.5, download it from [here](https://github.com/flxs/g3publishservice/blob/3c7053a458496ad021e1a04a750a0a418c850d6f/G3PublishService.lrplugin.zip).
+
 Please do contribute, this is (so far) a one-man show and I can't devote much work on this at the moment. I'm always happy to grant pull requests, though, so keep them coming.
 
 For the record, if you fork this, do give credit where credit is due and don't sell any stuff that isn't yours. Just play nice, ok?
+
+
 
 ## The original Blog Post ##
 
 Inspired by the Flickr integration in Lightroom 3, I've written a plugin to do quite the same for Gallery 3. It comes with both publish service and export dialogue integration and support for nested albums.
 
 ![Screenshot 1](http://felix.sappe.lt/wp-content/uploads/2010/09/screenshot1.png)
-
-#### Current Version ####
-
-The current version is **0.3.5** (released on October 1, 2010.)
 
 
 #### Important Notes ####
