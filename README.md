@@ -4,7 +4,7 @@ This plugin was previously located at [this site](http://felix.sappe.lt/?p=123).
 
 Thanks to Jeffrey Friedl for his JSON.lua script that this plugin is using.
 
-The current version is 0.3.5, download it from [here](https://github.com/flxs/g3publishservice/blob/3c7053a458496ad021e1a04a750a0a418c850d6f/G3PublishService.lrplugin.zip).
+The current version is 0.3.5, download it from [here](https://github.com/flxs/g3publishservice/raw/3c7053a458496ad021e1a04a750a0a418c850d6f/G3PublishService.lrplugin.zip).
 
 Please do contribute, this is (so far) a one-man show and I can't devote much work on this at the moment. I'm always happy to grant pull requests, though, so keep them coming.
 
